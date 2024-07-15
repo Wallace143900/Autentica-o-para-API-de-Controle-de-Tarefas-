@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.categoryRouter = void 0;
+const express_1 = require("express");
+const validateBody_middleware_1 = require("../middleware/validateBody.middleware");
+const category_schemas_1 = require("../schemas/category.schemas");
+const category_controller_1 = require("../controllers/category.controller");
+const isCategoryValid_middleware_1 = require("../middleware/isCategoryValid.middleware");
+const tsyringe_1 = require("tsyringe");
+const category_services_1 = require("../services/category.services");
+const verifyToken_middleware_1 = require("../middleware/verifyToken.middleware");
+const IsCategoryBelongsToUser_middleware_1 = require("../middleware/IsCategoryBelongsToUser.middleware");
+exports.categoryRouter = (0, express_1.Router)();
+tsyringe_1.container.registerSingleton("CategoryServices", category_services_1.CategoryServices);
+const categoryControllers = tsyringe_1.container.resolve(category_controller_1.CategoryControllers);
+exports.categoryRouter.post("/", verifyToken_middleware_1.VerifyToken.execute, validateBody_middleware_1.ValidateBody.execute(category_schemas_1.categoryCreateSchema), (req, res) => categoryControllers.create(req, res));
+exports.categoryRouter.delete("/:id", verifyToken_middleware_1.VerifyToken.execute, isCategoryValid_middleware_1.IsCategoryIdValid.execute, IsCategoryBelongsToUser_middleware_1.IsCategoryBelongsToUser.execute, (req, res) => categoryControllers.delete(req, res));
